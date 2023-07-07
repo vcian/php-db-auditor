@@ -1,0 +1,11 @@
+{
+    "name": "vcian/php-db-auditor",
+    "autoload": {
+        "psr-4": {
+            "Vcian\\PhpDbAuditor\\": "src/"
+        }
+    },
+    "require": {
+        "symfony/console": "^6.3"
+    }
+}
