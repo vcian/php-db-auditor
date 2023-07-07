@@ -1,8 +1,4 @@
-<p align="center"><img src="https://raw.githubusercontent.com/vcian/art/main/laravel-db-auditor/laravel-db-auditor-hr.svg" width="50%" alt="Logo Laravel DB Auditor"></p>
-
-![Packagist License](https://img.shields.io/packagist/l/vcian/laravel-db-auditor?style=for-the-badge)
-[![Total Downloads](https://img.shields.io/packagist/dt/vcian/laravel-db-auditor?style=for-the-badge)](https://packagist.org/packages/vcian/laravel-db-auditor)
-
+## PHP DB Auditor
 ## Introduction
 
 - This package provides to audit process of reviewing and evaluating a mysql database system.
