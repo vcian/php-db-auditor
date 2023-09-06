@@ -87,8 +87,12 @@ trait DBConnection
     {
         $fieldWithType = Constant::ARRAY_DECLARATION;
         try {
-            $fieldWithType = DB::select("SELECT * FROM `INFORMATION_SCHEMA`.`COLUMNS`
-                            WHERE `TABLE_SCHEMA`= '" . $this->getDatabaseName() . "' AND `TABLE_NAME`= '" . $tableName . "' ");
+            $conn = createConnection();
+            $query = "SELECT * FROM `INFORMATION_SCHEMA`.`COLUMNS`
+                        WHERE `TABLE_SCHEMA`= '" . $this->getDatabaseName() . "' AND `TABLE_NAME`= '" . $tableName . "' ";
+            $query = $conn->query($query);
+            // Fetch the results as an associative array
+            $fieldWithType = $query->fetch_all(MYSQLI_ASSOC);
         } catch (Exception $exception) {
             error_log($exception->getMessage());;
         }

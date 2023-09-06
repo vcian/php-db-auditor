@@ -5,10 +5,12 @@ require __DIR__.'/src/database.php';
 
 use Symfony\Component\Console\Application;
 use Vcian\PhpDbAuditor\Command\DBStandardCheck;
+use Vcian\PhpDbAuditor\Command\DBConstraintCheck;
 
 $application = new Application();
 
 # add our commands
-$application->add(new DBStandardCheck());
+// $application->add(new DBStandardCheck());
+$application->add(new DBConstraintCheck());
 
 $application->run();
