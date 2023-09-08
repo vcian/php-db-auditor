@@ -61,7 +61,7 @@ trait AuditService
      */
     public function getFieldDataType(string $tableName, string $field): array
     {
-        return $this->getFieldDataType($tableName, $field);
+        return $this->getFieldsDataType($tableName, $field);
     }
 
     /**
@@ -86,20 +86,25 @@ trait AuditService
      */
     public function getNoConstraintFields(string $tableName): array
     {
+        $conn = createConnection();
         $fields = Constant::ARRAY_DECLARATION;
         try {
-            $fieldList = DB::select("SELECT * FROM `INFORMATION_SCHEMA`.`COLUMNS`
-            WHERE `TABLE_SCHEMA`= '" . env('DB_DATABASE') . "' AND `TABLE_NAME`= '" . $tableName . "' AND `COLUMN_KEY` = '' ");
+            // $fieldList = DB::select("SELECT * FROM `INFORMATION_SCHEMA`.`COLUMNS`
+            // WHERE `TABLE_SCHEMA`= '" . env('DB_DATABASE') . "' AND `TABLE_NAME`= '" . $tableName . "' AND `COLUMN_KEY` = '' ");
+
+            $query = $conn->query("SELECT * FROM `INFORMATION_SCHEMA`.`COLUMNS`
+            WHERE `TABLE_SCHEMA`= '" . DB_NAME . "' AND `TABLE_NAME`= '" . $tableName . "' AND `COLUMN_KEY` = '' ");
+            $fieldList = $query->fetch_all(MYSQLI_ASSOC);
 
             foreach ($fieldList as $field) {
-                if (!in_array($field->DATA_TYPE, Constant::RESTRICT_DATATYPE)) {
-                    if (str_contains($field->DATA_TYPE, "int")) {
-                        $fields['integer'][] = $field->COLUMN_NAME;
+                if (!in_array($field['DATA_TYPE'], Constant::RESTRICT_DATATYPE)) {
+                    if (str_contains($field['DATA_TYPE'], "int")) {
+                        $fields['integer'][] = $field['COLUMN_NAME'];
                     }
-                    $fieldDetails = $this->getFieldDataType($tableName, $field->COLUMN_NAME);
+                    $fieldDetails = $this->getFieldDataType($tableName, $field['COLUMN_NAME']);
 
                     if ($fieldDetails['size'] <= Constant::DATATYPE_VARCHAR_SIZE) {
-                        $fields['mix'][] = $field->COLUMN_NAME;
+                        $fields['mix'][] = $field['COLUMN_NAME'];
                     }
                 }
             }
@@ -215,7 +220,8 @@ trait AuditService
     public function tableHasValue(string $tableName): bool
     {
         try {
-            if (DB::select("Select * from " . $tableName)) {
+            $conn = createConnection();
+            if ($conn->query("Select * from " . $tableName)) {
                 return Constant::STATUS_TRUE;
             }
         } catch (Exception $exception) {
@@ -325,10 +331,11 @@ trait AuditService
     public function getUniqueFields(string $tableName, array $fields): array
     {
         $uniqueField = Constant::ARRAY_DECLARATION;
+        $conn = createConnection();
         try {
             foreach ($fields as $field) {
-                $query = "SELECT `" . $field . "`, COUNT(`" . $field . "`) as count FROM " . $tableName . " GROUP BY `" . $field . "` HAVING COUNT(`" . $field . "`) > 1";
-                $result = DB::select($query);
+                $query = $conn->query("SELECT `" . $field . "`, COUNT(`" . $field . "`) as count FROM " . $tableName . " GROUP BY `" . $field . "` HAVING COUNT(`" . $field . "`) > 1");
+                $result = $query->fetch_all(MYSQLI_ASSOC);
 
                 if (empty($result)) {
                     $uniqueField[] = $field;

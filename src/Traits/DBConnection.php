@@ -166,6 +166,32 @@ trait DBConnection
     }
 
     /**
+     * Get Field Data Type
+     * @param string $tableName
+     * @param string $fieldName
+     * @return array|bool
+     */
+    public function getFieldsDataType(string $tableName, string $fieldName): array|bool
+    {
+        try {
+            $conn = createConnection();
+
+            $query = "SELECT `DATA_TYPE`, `CHARACTER_MAXIMUM_LENGTH`, `NUMERIC_PRECISION`, `NUMERIC_SCALE`  FROM `INFORMATION_SCHEMA`.`COLUMNS`
+            WHERE `TABLE_SCHEMA`= '" . $this->getDatabaseName() . "' AND `TABLE_NAME`= '" . $tableName . "' AND `COLUMN_NAME` = '" . $fieldName . "' ";
+
+            $query = $conn->query($query);
+            $dataType = $query->fetch_assoc();
+
+            if (isset($dataType['DATA_TYPE']) && $dataType !== null) {
+                return ['data_type' => $dataType['DATA_TYPE'], 'size' => $dataType['CHARACTER_MAXIMUM_LENGTH'] ];
+            }
+        } catch (Exception $exception) {
+            Log::error($exception->getMessage());
+        }
+        return Constant::STATUS_FALSE;
+    }
+
+    /**
      * Check Field Has Index Constraint
      * @param string $tableName
      * @param string $fieldName
