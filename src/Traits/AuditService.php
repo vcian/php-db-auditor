@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Vcian\PhpDbAuditor\Constants\Constant;
 use Vcian\PhpDbAuditor\Traits\DBConnection as DBConnectionService;
+use Vcian\PhpDbAuditor\Traits\DBConstraint as DBConstraintService;
 
 trait AuditService
 {
-    use DBConnectionService;
+    use DBConnectionService, DBConstraintService;
 
     /**
      * Get All Table List
@@ -174,7 +175,7 @@ trait AuditService
                 }
             }
         } catch (Exception $exception) {
-            Log::error($exception->getMessage());
+            error_log($exception->getMessage());
         }
         return $constraintFields;
     }
@@ -221,7 +222,8 @@ trait AuditService
     {
         try {
             $conn = createConnection();
-            if ($conn->query("Select * from " . $tableName)) {
+            $result = $conn->query("Select * from " . $tableName);
+            if ($result->num_rows > 0) {
                 return Constant::STATUS_TRUE;
             }
         } catch (Exception $exception) {
@@ -247,16 +249,16 @@ trait AuditService
         try {
             switch ($constraint) {
                 case Constant::CONSTRAINT_PRIMARY_KEY:
-                    $this->migrateConstrain(Constant::PRIMARY_FILE_NAME, $constraint, $table, $field);
+                    $this->migrateConstrain(Constant::CONSTRAINT_PRIMARY_KEY, $constraint, $table, $field);
                     break;
                 case Constant::CONSTRAINT_INDEX_KEY:
-                    $this->migrateConstrain(Constant::INDEX_FILE_NAME, $constraint, $table, $field);
+                    $this->migrateConstrain(Constant::CONSTRAINT_INDEX_KEY, $constraint, $table, $field);
                     break;
                 case Constant::CONSTRAINT_UNIQUE_KEY:
-                    $this->migrateConstrain(Constant::UNIQUE_FILE_NAME, $constraint, $table, $field);
+                    $this->migrateConstrain(Constant::CONSTRAINT_UNIQUE_KEY, $constraint, $table, $field);
                     break;
                 case Constant::CONSTRAINT_FOREIGN_KEY:
-                    $this->migrateConstrain(Constant::FOREIGN_FILE_NAME, $constraint, $table, $field, $referenceField, $referenceTableName);
+                    $this->migrateConstrain(Constant::CONSTRAINT_FOREIGN_KEY, $constraint, $table, $field, $referenceField, $referenceTableName);
                     break;
                 default:
                     return Constant::STATUS_FALSE;
@@ -290,32 +292,15 @@ trait AuditService
                 $fieldDataType = Constant::MYSQL_DATATYPE_TO_LARAVEL_DATATYPE[$fieldDetails['data_type']] ?? $fieldDetails['data_type'];
             }
 
-            $stubVariables = [
-                "tableName" => $tableName,
-                "fieldName" => $fieldName,
-                "referenceField" => $referenceField,
-                "referenceTable" => $referenceTableName,
-                "dataType" => $fieldDataType,
-                'length' => $fieldDetails['size'],
-            ];
+            $methodName = 'set'.ucfirst(strtolower($fileName)).'Constraint';
 
-            $contents = file_get_contents(__DIR__ . "/../Database/migrations/" . $fileName);
-
-            foreach ($stubVariables as $search => $replace) {
-                if ($search === "dataType") {
-                    $contents = str_replace('$' . $search, $replace, $contents);
-                } else {
-                    $contents = str_replace('$' . $search, "'$replace'", $contents);
-                }
+            if (method_exists($this, $methodName)) {
+                $this->$methodName($tableName, $fieldName);
+            } else {
+                // Handle the case where the method doesn't exist
+                echo "Method $methodName does not exist.";
             }
 
-            $time = time();
-
-            File::put(database_path("/migrations/" . $time . "_update_" . $tableName . "_" . $fieldName . "_" . strtolower($constrainName) . ".php"), $contents);
-
-            Artisan::call("migrate", [
-                '--path' => "database/migrations/" . $time . "_update_" . $tableName . "_" . $fieldName . "_" . strtolower($constrainName) . ".php"
-            ]);
         } catch (Exception $exception) {
             Log::error($exception->getMessage());
         }

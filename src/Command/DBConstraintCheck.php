@@ -47,17 +47,19 @@ class DBConstraintCheck extends Command
                 $tableLists
             );
 
-            do {
-                $tableName = $io->ask('Which table would you like to audit?');
-                $this->displayTable($tableName,$input,$output);
-                if (empty($tableName)) {
-                    $output->writeln('<fg=bright-red>No Table Found</>');
-                    return Constant::STATUS_FALSE;
-                } else {
-                    $continue = Constant::STATUS_TRUE;
+            $tableName = $io->ask('Which table would you like to audit?');
+            $this->displayTable($tableName,$input,$output);
+            if (empty($tableName)) {
+                $output->writeln('<fg=bright-red>No Table Found</>');
+                return Constant::STATUS_FALSE;
+            }
 
+            if ($tableName) {
+
+                $continue = Constant::STATUS_TRUE;
+
+                do {
                     $noConstraintFields = $this->getNoConstraintFields($tableName);
-
                     if (empty($noConstraintFields)) {
                         $continue = Constant::STATUS_FALSE;
                     } else {
@@ -69,20 +71,17 @@ class DBConstraintCheck extends Command
                                 $constraintList
                             );
 
-                            $this->selectedConstraint($selectConstrain, $noConstraintFields, $tableName);
+                            $this->selectedConstraint($selectConstrain, $noConstraintFields, $tableName, $input, $output);
                         } else {
                             $continue = Constant::STATUS_FALSE;
                         }
                     }
-                }
 
-            } while ($continue === Constant::STATUS_TRUE);
-
-            return Command::SUCCESS;
+                } while ($continue === Constant::STATUS_TRUE);
+            }
 
         } catch (\Exception $exception) {
-            Log::error($exception->getMessage());
-            return $exception->getMessage();
+            error_log($exception->getMessage());
         }
 
         return Command::SUCCESS;
@@ -141,7 +140,7 @@ class DBConstraintCheck extends Command
             }
         }
         // echo "<pre>"; print_r($data);die;
-        return true;
+        return Constant::STATUS_TRUE;
     }
 
     /**
@@ -150,16 +149,15 @@ class DBConstraintCheck extends Command
      * @param string $tableName
      * @return void
      */
-    public function selectedConstraint(string $selectConstrain, array $noConstraintFields, string $tableName): void
+    public function selectedConstraint(string $selectConstrain, array $noConstraintFields, string $tableName, $input, $output): void
     {
 
-        $auditService = app(AuditService::class);
-
         if ($selectConstrain === Constant::CONSTRAINT_FOREIGN_KEY) {
-            $tableHasValue = $auditService->tableHasValue($tableName);
+            $tableHasValue = $this->tableHasValue($tableName);
 
             if ($tableHasValue) {
-                $this->errorMessage(__('Lang::messages.constraint.error_message.constraint_not_apply', ['constraint' => strtolower($selectConstrain)]));
+                $output->writeln('<fg=bright-red>Can not apply '.strtolower($selectConstrain).' key | Please truncate table.</>');
+                // $this->errorMessage(__('Lang::messages.constraint.error_message.constraint_not_apply', ['constraint' => strtolower($selectConstrain)]));
             }
         }
 
@@ -171,33 +169,94 @@ class DBConstraintCheck extends Command
             }
 
             if ($selectConstrain === Constant::CONSTRAINT_UNIQUE_KEY) {
-                $fields = $auditService->getUniqueFields($tableName, $noConstraintFields['mix']);
+                $fields = $this->getUniqueFields($tableName, $noConstraintFields['mix']);
                 if (empty($fields)) {
-                    $this->errorMessage(__('Lang::messages.constraint.error_message.unique_constraint_not_apply'));
+                    $output->writeln("<fg=bright-red>All field values are duplicate. You can't add unique constraint.</>");
                 }
             }
 
+            $io = new SymfonyStyle($input, $output);
+
             if (!$this->skip) {
-                $selectField = $this->choice(
-                    __('Lang::messages.constraint.question.field_selection') . ' ' . strtolower($selectConstrain) . ' key',
+                $selectField = $io->choice('Please select a field to add constraint' . ' ' . strtolower($selectConstrain) . ' key',
                     $fields
                 );
 
                 if ($selectConstrain === Constant::CONSTRAINT_FOREIGN_KEY) {
-                    $this->foreignKeyConstraint($tableName, $selectField);
+                    $this->foreignKeyConstraint($tableName, $selectField, $input, $output);
                 } else {
-                    $auditService->addConstraint($tableName, $selectField, $selectConstrain);
+                    $this->addConstraint($tableName, $selectField, $selectConstrain);
                 }
             }
         }
 
         if (!$this->skip) {
-            renderUsing($this->output);
+            // renderUsing($this->output);
+            $output->writeln('<fg=bright-green>Congratulations! Constraint Added Successfully.</>');
 
-            $this->successMessage(__('Lang::messages.constraint.success_message.constraint_added'));
+            $this->displayTable($tableName, $input, $output);
+        }
+    }
 
-            $this->displayTable($tableName);
+    /**
+     * Get Foreign Key Constrain
+     * @param string $tableName
+     * @param string $selectField
+     * @return void
+     */
+    public function foreignKeyConstraint(string $tableName, string $selectField , $input, $output): void
+    {
+        $foreignContinue = Constant::STATUS_FALSE;
+        $referenceField = Constant::NULL;
+        $fields = Constant::ARRAY_DECLARATION;
+
+        do {
+            $io = new SymfonyStyle($input, $output);
+            $referenceTable = $io->choice('Please add foreign table name.', $this->getTableList());
+
+            if ($referenceTable && $this->checkTableExistOrNot($referenceTable)) {
+
+                foreach ($this->getTableFields($referenceTable) as $field) {
+                    $fields[] = $field['COLUMN_NAME'];
+                }
+                do {
+                    $referenceField = $io->choice('Please add primary key name of foreign table.', $fields);
+
+                    if (!$referenceField || !$this->checkFieldExistOrNot($referenceTable, $referenceField)) {
+                        $output->writeln('<fg=bright-white>Foreign field not found.</>');
+                    } else {
+                        $foreignContinue = Constant::STATUS_TRUE;
+                    }
+                } while ($foreignContinue === Constant::STATUS_FALSE);
+
+            } else {
+                $output->writeln('<fg=bright-white>Foreign table not found.</>');
+            }
+        } while ($foreignContinue === Constant::STATUS_FALSE);
+
+        $referenceFieldType = $this->getFieldDataType($referenceTable, $referenceField);
+        $selectedFieldType = $this->getFieldDataType($tableName, $selectField);
+
+        if ($referenceTable === $tableName) {
+            $this->errorMessage(__('Lang::messages.constraint.error_message.foreign_selected_table_match', ['foreign' => $referenceTable, 'selected' => $tableName]));
         }
 
+        if ($referenceFieldType['data_type'] !== $selectedFieldType['data_type']) {
+
+            render('
+            <div class="mt-1">
+                <div class="flex space-x-1">
+                    <span class="font-bold text-green">' . $selectedFieldType['data_type'] . '</span>
+                    <i class="text-blue">' . $selectField . '</i>
+                    <span class="flex-1 content-repeat-[.] text-gray"></span>
+                    <i class="text-blue">' . $referenceField . '</i>
+                    <span class="font-bold text-green">' . $referenceFieldType['data_type'] . '</span>
+                </div>
+            </div>
+            ');
+            $this->errorMessage(__('Lang::messages.constraint.error_message.foreign_not_apply'));
+        } else {
+            $this->addConstraint($tableName, $selectField, Constant::CONSTRAINT_FOREIGN_KEY, $referenceTable, $referenceField);
+        }
     }
 }

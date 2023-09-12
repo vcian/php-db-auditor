@@ -73,7 +73,7 @@ trait DBConnection
                 return Constant::STATUS_TRUE;
             }
         } catch (Exception $exception) {
-            error_log($exception->getMessage());;
+            error_log($exception->getMessage());
         }
         return Constant::STATUS_FALSE;
     }
