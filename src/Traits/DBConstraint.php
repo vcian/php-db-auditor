@@ -35,12 +35,12 @@ trait DBConstraint
     /**
      * Set Index Key Constraint
      * @param string $tableName
-     * @param string $fieldName
+     * @param array $stubVariables
      * @return array|bool
      */
-    public function setIndexConstraint(string $tableName, string $fieldName): bool
+    public function setIndexConstraint(array $stubVariables): bool
     {
-        $sql = "CREATE INDEX idx_".$fieldName." ON ".$tableName." (".$fieldName.");";
+        $sql = "CREATE INDEX idx_".$stubVariables['fieldName']." ON ".$stubVariables['tableName']." (".$stubVariables['fieldName'].");";
         $conn = createConnection();
         if ($conn->query($sql) === Constant::STATUS_TRUE) {
             return Constant::STATUS_TRUE;
@@ -52,12 +52,12 @@ trait DBConstraint
     /**
      * Set Unique Key Constraint
      * @param string $tableName
-     * @param string $fieldName
+     * @param array $stubVariables
      * @return array|bool
      */
-    public function setUniqueConstraint(string $tableName, string $fieldName): bool
+    public function setUniqueConstraint(array $stubVariables): bool
     {
-        $sql = "CREATE UNIQUE INDEX uk_".$fieldName." ON ".$tableName." (".$fieldName.");";
+        $sql = "CREATE UNIQUE INDEX uk_".$stubVariables['fieldName']." ON ".$stubVariables['tableName']." (".$stubVariables['fieldName'].");";
         $conn = createConnection();
         if ($conn->query($sql) === Constant::STATUS_TRUE) {
             return Constant::STATUS_TRUE;
@@ -70,12 +70,12 @@ trait DBConstraint
     /**
      * Set Primary Key Constraint
      * @param string $tableName
-     * @param string $fieldName
+     * @param array $stubVariables
      * @return array|bool
      */
-    public function setPrimaryConstraint(string $tableName, string $fieldName): bool
+    public function setPrimaryConstraint(array $stubVariables): bool
     {
-        $sql = "ALTER TABLE ".$tableName." ADD PRIMARY KEY (".$fieldName.");";
+        $sql = "ALTER TABLE ".$stubVariables['tableName']." ADD PRIMARY KEY (".$stubVariables['fieldName'].");";
         $conn = createConnection();
         if ($conn->query($sql) === Constant::STATUS_TRUE) {
             return Constant::STATUS_TRUE;
@@ -88,12 +88,15 @@ trait DBConstraint
     /**
      * Set Foreign Key Constraint
      * @param string $tableName
-     * @param string $fieldName
+     * @param array $stubVariables
      * @return array|bool
      */
-    public function setForeignConstraint(string $tableName, string $fieldName): bool
+    public function setForeignConstraint(array $stubVariables): bool
     {
-        $sql = "ALTER TABLE ".$tableName." ADD PRIMARY KEY (".$fieldName.");";
+        $sql = "ALTER TABLE ".$stubVariables['tableName']."
+                ADD CONSTRAINT fk_".$stubVariables['fieldName']."
+                FOREIGN KEY (".$stubVariables['fieldName'].")
+                REFERENCES ".$stubVariables['referenceTable']." (".$stubVariables['referenceField'].");";
         $conn = createConnection();
         if ($conn->query($sql) === Constant::STATUS_TRUE) {
             return Constant::STATUS_TRUE;

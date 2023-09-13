@@ -212,7 +212,7 @@ class DBConstraintCheck extends Command
 
         do {
             $io = new SymfonyStyle($input, $output);
-            $referenceTable = $io->choice('Please add foreign table name.', $this->getTableList());
+            $referenceTable = $io->ask('Please add foreign table name.');
 
             if ($referenceTable && $this->checkTableExistOrNot($referenceTable)) {
 
@@ -220,10 +220,10 @@ class DBConstraintCheck extends Command
                     $fields[] = $field['COLUMN_NAME'];
                 }
                 do {
-                    $referenceField = $io->choice('Please add primary key name of foreign table.', $fields);
+                    $referenceField = $io->ask('Please add primary key name of foreign table.');
 
                     if (!$referenceField || !$this->checkFieldExistOrNot($referenceTable, $referenceField)) {
-                        $output->writeln('<fg=bright-white>Foreign field not found.</>');
+                        $output->writeln('<fg=bright-red>Foreign field not found.</>');
                     } else {
                         $foreignContinue = Constant::STATUS_TRUE;
                     }
@@ -243,18 +243,22 @@ class DBConstraintCheck extends Command
 
         if ($referenceFieldType['data_type'] !== $selectedFieldType['data_type']) {
 
-            render('
-            <div class="mt-1">
-                <div class="flex space-x-1">
-                    <span class="font-bold text-green">' . $selectedFieldType['data_type'] . '</span>
-                    <i class="text-blue">' . $selectField . '</i>
-                    <span class="flex-1 content-repeat-[.] text-gray"></span>
-                    <i class="text-blue">' . $referenceField . '</i>
-                    <span class="font-bold text-green">' . $referenceFieldType['data_type'] . '</span>
-                </div>
-            </div>
-            ');
-            $this->errorMessage(__('Lang::messages.constraint.error_message.foreign_not_apply'));
+            $output->writeln("<fg=bright-green>".$selectedFieldType['data_type']."</>"." "."
+                            <fg=bright-blue>".$selectField."</>.........................................................................................
+                            <fg=bright-blue>".$referenceField."</> <fg=bright-green>".$referenceFieldType['data_type']."</>");
+            // render('
+            // <div class="mt-1">
+            //     <div class="flex space-x-1">
+            //         <span class="font-bold text-green">' . $selectedFieldType['data_type'] . '</span>
+            //         <i class="text-blue">' . $selectField . '</i>
+            //         <span class="flex-1 content-repeat-[.] text-gray"></span>
+            //         <i class="text-blue">' . $referenceField . '</i>
+            //         <span class="font-bold text-green">' . $referenceFieldType['data_type'] . '</span>
+            //     </div>
+            // </div>
+            // ');
+            // $this->errorMessage(__('Lang::messages.constraint.error_message.foreign_not_apply'));
+            $output->writeln('<fg=bright-red>Columns must have the same datatype.</>');
         } else {
             $this->addConstraint($tableName, $selectField, Constant::CONSTRAINT_FOREIGN_KEY, $referenceTable, $referenceField);
         }

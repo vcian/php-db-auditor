@@ -292,17 +292,25 @@ trait AuditService
                 $fieldDataType = Constant::MYSQL_DATATYPE_TO_LARAVEL_DATATYPE[$fieldDetails['data_type']] ?? $fieldDetails['data_type'];
             }
 
+            $stubVariables = [
+                "tableName" => $tableName,
+                "fieldName" => $fieldName,
+                "referenceField" => $referenceField,
+                "referenceTable" => $referenceTableName,
+                "dataType" => $fieldDataType
+            ];
+
             $methodName = 'set'.ucfirst(strtolower($fileName)).'Constraint';
 
             if (method_exists($this, $methodName)) {
-                $this->$methodName($tableName, $fieldName);
+                $this->$methodName($stubVariables);
             } else {
                 // Handle the case where the method doesn't exist
                 echo "Method $methodName does not exist.";
             }
 
         } catch (Exception $exception) {
-            Log::error($exception->getMessage());
+            error_log($exception->getMessage());
         }
         return Constant::STATUS_TRUE;
     }
