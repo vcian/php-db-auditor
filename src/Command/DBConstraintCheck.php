@@ -189,7 +189,6 @@ class DBConstraintCheck extends Command
                 }
             }
         }
-
         if (!$this->skip) {
             // renderUsing($this->output);
             $output->writeln('<fg=bright-green>Congratulations! Constraint Added Successfully.</>');
@@ -238,27 +237,14 @@ class DBConstraintCheck extends Command
         $selectedFieldType = $this->getFieldDataType($tableName, $selectField);
 
         if ($referenceTable === $tableName) {
-            $this->errorMessage(__('Lang::messages.constraint.error_message.foreign_selected_table_match', ['foreign' => $referenceTable, 'selected' => $tableName]));
+            $output->writeln("Can't add constraint because ".$tableName." table and foreign ".$referenceTable." table are same. Please use different table name.");
         }
 
         if ($referenceFieldType['data_type'] !== $selectedFieldType['data_type']) {
-
-            $output->writeln("<fg=bright-green>".$selectedFieldType['data_type']."</>"." "."
-                            <fg=bright-blue>".$selectField."</>.........................................................................................
-                            <fg=bright-blue>".$referenceField."</> <fg=bright-green>".$referenceFieldType['data_type']."</>");
-            // render('
-            // <div class="mt-1">
-            //     <div class="flex space-x-1">
-            //         <span class="font-bold text-green">' . $selectedFieldType['data_type'] . '</span>
-            //         <i class="text-blue">' . $selectField . '</i>
-            //         <span class="flex-1 content-repeat-[.] text-gray"></span>
-            //         <i class="text-blue">' . $referenceField . '</i>
-            //         <span class="font-bold text-green">' . $referenceFieldType['data_type'] . '</span>
-            //     </div>
-            // </div>
-            // ');
-            // $this->errorMessage(__('Lang::messages.constraint.error_message.foreign_not_apply'));
+            $output->writeln("<fg=bright-green>".$selectedFieldType['data_type']."</> <fg=bright-blue>".$selectField."</>...........................................................................................................................................<fg=bright-blue>".$referenceField."</> <fg=bright-green>".$referenceFieldType['data_type']."</>");
+            $output->writeln("");
             $output->writeln('<fg=bright-red>Columns must have the same datatype.</>');
+            $this->skip = Constant::STATUS_TRUE;
         } else {
             $this->addConstraint($tableName, $selectField, Constant::CONSTRAINT_FOREIGN_KEY, $referenceTable, $referenceField);
         }
