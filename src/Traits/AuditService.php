@@ -3,10 +3,6 @@
 namespace Vcian\PhpDbAuditor\Traits;
 
 use Exception;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
 use Vcian\PhpDbAuditor\Constants\Constant;
 use Vcian\PhpDbAuditor\Traits\DBConnection as DBConnectionService;
 use Vcian\PhpDbAuditor\Traits\DBConstraint as DBConstraintService;
@@ -110,7 +106,7 @@ trait AuditService
                 }
             }
         } catch (Exception $exception) {
-            Log::error($exception->getMessage());
+            error_log($exception->getMessage());
         }
         return $fields;
     }
@@ -208,7 +204,7 @@ trait AuditService
                 }
             }
         } catch (Exception $exception) {
-            Log::error($exception->getMessage());
+            error_log($exception->getMessage());
         }
         return $foreignFieldDetails;
     }
@@ -227,7 +223,7 @@ trait AuditService
                 return Constant::STATUS_TRUE;
             }
         } catch (Exception $exception) {
-            Log::error($exception->getMessage());
+            error_log($exception->getMessage());
         }
         return Constant::STATUS_FALSE;
     }
@@ -264,7 +260,7 @@ trait AuditService
                     return Constant::STATUS_FALSE;
             }
         } catch (Exception $exception) {
-            Log::error($exception->getMessage());
+            error_log($exception->getMessage());
         }
         return Constant::STATUS_TRUE;
     }
@@ -336,7 +332,7 @@ trait AuditService
             }
 
         } catch (Exception $exception) {
-            Log::error($exception->getMessage());
+            error_log($exception->getMessage());
         }
         return $uniqueField;
     }

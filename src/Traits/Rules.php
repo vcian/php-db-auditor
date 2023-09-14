@@ -8,8 +8,6 @@ use Vcian\PhpDbAuditor\Constants\Constant;
 use Vcian\PhpDbAuditor\Traits\DBConnection;
 use Vcian\PhpDbAuditor\Traits\NamingRules;
 
-include_once './src/Lang/en/messages.php';
-
 trait Rules
 {
     use NamingRules, DBConnection;

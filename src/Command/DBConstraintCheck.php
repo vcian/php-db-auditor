@@ -191,7 +191,22 @@ class DBConstraintCheck extends Command
         }
         if (!$this->skip) {
             // renderUsing($this->output);
-            $output->writeln('<fg=bright-green>Congratulations! Constraint Added Successfully.</>');
+            $output->writeln('.-"""-.
+                              / .===. \
+                              \/ 6 6 \/
+                              ( \___/ )
+                _________________ooo_\_____/______________________
+                /                                                  \
+                |   Congratulations! Constraint Added Successfully.   |
+                \______________________________ooo_________________/
+                               |  |  |
+                               |_ | _|
+                               |  |  |
+                               |__|__|
+                               /-`Y`-\
+                               (__/ \__)');
+
+            // $output->writeln('<fg=bright-green>Congratulations! Constraint Added Successfully.</>');
 
             $this->displayTable($tableName, $input, $output);
         }
