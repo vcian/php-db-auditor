@@ -39,15 +39,15 @@ class DBConstraintCheck extends Command
             $io->title('PHP DB Auditor');
 
             foreach ($tableList as $key => $tableName) {
-                $tableLists[] = [$tableName.'................................................................................................................................', $key];
+                $tableLists[] = [$tableName.'<fg=gray>................................................................................................................................</>', $key];
             }
 
             $io->table(
-                ['Table Name','Choice Number'],
+                ['Table Name','<fg=bright-white>Choice Number</>'],
                 $tableLists
             );
 
-            $tableName = $io->ask('Which table would you like to audit?');
+            $tableName = $io->choice('Which table would you like to audit?',$tableList);
             $this->displayTable($tableName,$input,$output);
             if (empty($tableName)) {
                 $output->writeln('<fg=bright-red>No Table Found</>');
@@ -63,6 +63,7 @@ class DBConstraintCheck extends Command
                     if (empty($noConstraintFields)) {
                         $continue = Constant::STATUS_FALSE;
                     } else {
+                        $io->newLine();
                         $ask = $io->ask('Do you want add more constraint? (yes/no) [no]');
                         if (strtolower($ask) == 'yes') {
                             $this->skip = Constant::STATUS_FALSE;
@@ -81,7 +82,7 @@ class DBConstraintCheck extends Command
             }
 
         } catch (\Exception $exception) {
-            error_log($exception->getMessage());
+            $io->error($exception->getMessage());
         }
 
         return Command::SUCCESS;
@@ -115,7 +116,7 @@ class DBConstraintCheck extends Command
         foreach ($data['fields'] as $field) {
 
             $tableLists[] = ['<fg=bright-white>' .$field['COLUMN_NAME'].'</>'.
-                            ' <fg=bright-blue>' .$field['COLUMN_TYPE'].'</>...............................................................................................................................',
+                            ' <fg=bright-blue>' .$field['COLUMN_TYPE'].'</>................................................................................................................................................',
                             '<fg=bright-green>'.$field['DATA_TYPE'].'</>'];
         }
         $io = new SymfonyStyle($input, $output);
@@ -131,12 +132,11 @@ class DBConstraintCheck extends Command
             }
             foreach ($value as $constrainField) {
                     if($key === 'foreign') {
-                        $output->writeln('<fg=bright-white>'.$constrainField['column_name'].'</>.........................................................................................................................................'.
+                        $output->writeln('<fg=bright-white>'.$constrainField['column_name'].'</><fg=gray>.........................................................................................................................................................</>'.
                         '<fg=blue>'.$constrainField['foreign_table_name'].'</>'.' <fg=bright-green>'.$constrainField['foreign_column_name'].'</>');
                     } else {
-                        $output->writeln('<fg=bright-white>'.$constrainField.'</>.............................................................................................................................................');
-                        $output->writeln('');
-                }
+                        $output->writeln('<fg=bright-white>'.$constrainField.'</><fg=gray>.................................................................................................................................................................</>');
+                    }
             }
         }
         // echo "<pre>"; print_r($data);die;
@@ -157,7 +157,6 @@ class DBConstraintCheck extends Command
 
             if ($tableHasValue) {
                 $output->writeln('<fg=bright-red>Can not apply '.strtolower($selectConstrain).' key | Please truncate table.</>');
-                // $this->errorMessage(__('Lang::messages.constraint.error_message.constraint_not_apply', ['constraint' => strtolower($selectConstrain)]));
             }
         }
 
@@ -190,23 +189,20 @@ class DBConstraintCheck extends Command
             }
         }
         if (!$this->skip) {
-            // renderUsing($this->output);
             $output->writeln('.-"""-.
-                              / .===. \
-                              \/ 6 6 \/
-                              ( \___/ )
-                _________________ooo_\_____/______________________
-                /                                                  \
-                |   Congratulations! Constraint Added Successfully.   |
-                \______________________________ooo_________________/
-                               |  |  |
-                               |_ | _|
-                               |  |  |
-                               |__|__|
-                               /-`Y`-\
-                               (__/ \__)');
-
-            // $output->writeln('<fg=bright-green>Congratulations! Constraint Added Successfully.</>');
+                            / .===. \
+                            \/ 6 6 \/
+                            ( \___/ )
+             ____________ooo_\_____/______________________
+            /                                                \
+            |   <fg=bright-green>Congratulations! Constraint Added Successfully.|</>
+            \______________________________ooo_________________/
+                             |  |  |
+                             |_ | _|
+                             |  |  |
+                             |__|__|
+                             /-`Y`-\
+                             (__/ \__)');
 
             $this->displayTable($tableName, $input, $output);
         }
@@ -237,14 +233,14 @@ class DBConstraintCheck extends Command
                     $referenceField = $io->ask('Please add primary key name of foreign table.');
 
                     if (!$referenceField || !$this->checkFieldExistOrNot($referenceTable, $referenceField)) {
-                        $output->writeln('<fg=bright-red>Foreign field not found.</>');
+                        $io->error('Foreign field not found.');
                     } else {
                         $foreignContinue = Constant::STATUS_TRUE;
                     }
                 } while ($foreignContinue === Constant::STATUS_FALSE);
 
             } else {
-                $output->writeln('<fg=bright-white>Foreign table not found.</>');
+                $io->error('Foreign table not found.');
             }
         } while ($foreignContinue === Constant::STATUS_FALSE);
 
@@ -252,13 +248,14 @@ class DBConstraintCheck extends Command
         $selectedFieldType = $this->getFieldDataType($tableName, $selectField);
 
         if ($referenceTable === $tableName) {
-            $output->writeln("Can't add constraint because ".$tableName." table and foreign ".$referenceTable." table are same. Please use different table name.");
+            $io->error("Can't add constraint because ".$tableName." table and foreign ".$referenceTable." table are same. Please use different table name.");
+            $this->skip = Constant::STATUS_TRUE;
         }
 
         if ($referenceFieldType['data_type'] !== $selectedFieldType['data_type']) {
             $output->writeln("<fg=bright-green>".$selectedFieldType['data_type']."</> <fg=bright-blue>".$selectField."</>...........................................................................................................................................<fg=bright-blue>".$referenceField."</> <fg=bright-green>".$referenceFieldType['data_type']."</>");
             $output->writeln("");
-            $output->writeln('<fg=bright-red>Columns must have the same datatype.</>');
+            $io->error('Columns must have the same datatype.');
             $this->skip = Constant::STATUS_TRUE;
         } else {
             $this->addConstraint($tableName, $selectField, Constant::CONSTRAINT_FOREIGN_KEY, $referenceTable, $referenceField);

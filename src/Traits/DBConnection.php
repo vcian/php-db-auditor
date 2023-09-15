@@ -3,8 +3,6 @@
 namespace Vcian\PhpDbAuditor\Traits;
 
 use Exception;
-use Illuminate\Support\Facades\Log;
-use PDO;
 use Vcian\PhpDbAuditor\Constants\Constant;
 
 trait DBConnection
@@ -118,7 +116,6 @@ trait DBConnection
 
             // Fetch the results as an associative array
             $result = $query->fetch_all(MYSQLI_ASSOC);
-            // $result = DB::select($query);
             if ($result) {
                 return $result[0]['size'];
             }
@@ -144,7 +141,6 @@ trait DBConnection
 
             $query = $conn->query($query);
             $dataType = $query->fetch_assoc();
-            // DB::select($query)[0];
             if(in_array($dataType['DATA_TYPE'], Constant::NUMERIC_DATATYPE)) {
 
                 if($dataType['DATA_TYPE'] === Constant::DATATYPE_DECIMAL) {
@@ -186,7 +182,7 @@ trait DBConnection
                 return ['data_type' => $dataType['DATA_TYPE'], 'size' => $dataType['CHARACTER_MAXIMUM_LENGTH'] ];
             }
         } catch (Exception $exception) {
-            Log::error($exception->getMessage());
+            error_log($exception->getMessage());
         }
         return Constant::STATUS_FALSE;
     }

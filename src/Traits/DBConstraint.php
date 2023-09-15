@@ -45,7 +45,6 @@ trait DBConstraint
         if ($conn->query($sql) === Constant::STATUS_TRUE) {
             return Constant::STATUS_TRUE;
         } else {
-            // echo "Error creating index: " . self::$conn->error;
             return Constant::STATUS_FALSE;
         }
     }
@@ -62,7 +61,6 @@ trait DBConstraint
         if ($conn->query($sql) === Constant::STATUS_TRUE) {
             return Constant::STATUS_TRUE;
         } else {
-            // echo "Error creating index: " . self::$conn->error;
             return Constant::STATUS_FALSE;
         }
     }
@@ -80,7 +78,6 @@ trait DBConstraint
         if ($conn->query($sql) === Constant::STATUS_TRUE) {
             return Constant::STATUS_TRUE;
         } else {
-            // echo "Error creating index: " . self::$conn->error;
             return Constant::STATUS_FALSE;
         }
     }
@@ -101,7 +98,6 @@ trait DBConstraint
         if ($conn->query($sql) === Constant::STATUS_TRUE) {
             return Constant::STATUS_TRUE;
         } else {
-            // echo "Error creating index: " . self::$conn->error;
             return Constant::STATUS_FALSE;
         }
     }

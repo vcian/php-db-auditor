@@ -158,7 +158,11 @@ trait AuditService
                 return [];
             }
 
-            $query = $conn->query("SHOW KEYS FROM {$tableName} WHERE Key_name LIKE '%" . strtolower($input) . "%'");
+            if($input === Constant::CONSTRAINT_INDEX_KEY) {
+                $query = $conn->query("SHOW INDEX FROM {$tableName} where Key_name != 'PRIMARY' and Key_name not like '%unique%'");
+            } else {
+                $query = $conn->query("SHOW KEYS FROM {$tableName} WHERE Key_name LIKE '%" . strtolower($input) . "%'");
+            }
             $result = $query->fetch_all(MYSQLI_ASSOC);
 
             if ($input === Constant::CONSTRAINT_FOREIGN_KEY) {

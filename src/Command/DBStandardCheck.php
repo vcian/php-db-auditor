@@ -13,11 +13,13 @@ use Vcian\PhpDbAuditor\Constants\Constant;
 class DBStandardCheck extends Command
 {
     use Rules;
+    protected static $defaultName = 'standard';
 
     protected function configure()
     {
         $this->setName('standard')
-            ->setDescription('My custom command');
+            ->setDescription('Execute the DB standard command')
+            ->setHelp('This command executes the standard rules for table.');
     }
     /**
      * Execute command to check the standard of tables.
@@ -70,11 +72,11 @@ class DBStandardCheck extends Command
                 $status = '<fg=bright-red>✗</>';
                 $error++;
             }
-            $tableLists[] = [$table['name']. '<fg=bright-blue> ('.$table['size'].' MB)</>...............................................................................................................................', $status];
+            $tableLists[] = [$table['name']. '<fg=bright-blue> ('.$table['size'].' MB)</><fg=gray>...............................................................................................................................</>', $status];
         }
 
         $io->table(
-            ['Table Name', 'Standardization'],
+            ['Table Name', '<fg=bright-white>Standardization</>'],
             $tableLists
         );
 

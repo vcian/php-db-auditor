@@ -3,7 +3,6 @@
 namespace Vcian\PhpDbAuditor\Traits;
 
 use Exception;
-use Illuminate\Support\Facades\Log;
 use Vcian\PhpDbAuditor\Constants\Constant;
 use Vcian\PhpDbAuditor\Traits\DBConnection;
 use Vcian\PhpDbAuditor\Traits\NamingRules;
@@ -32,7 +31,7 @@ trait Rules
                 $checkTableStandard[] = ["name" => $tableName, "status" => $status, "size" => $size];
             }
         } catch (Exception $exception) {
-            error_log($exception->getMessage());;
+            error_log($exception->getMessage());
         }
         return $checkTableStandard;
     }
@@ -126,7 +125,7 @@ trait Rules
                 }
             }
         } catch (Exception $exception) {
-            error_log($exception->getMessage());;
+            error_log($exception->getMessage());
         }
         return $checkFields;
     }
@@ -152,7 +151,7 @@ trait Rules
                 $checkTableStatus = ["table" => $tableName, "table_comment" => $tableComment, "fields" => $fields];
             }
         } catch (Exception $exception) {
-            error_log($exception->getMessage());;
+            error_log($exception->getMessage());
         }
         return $checkTableStatus;
     }
