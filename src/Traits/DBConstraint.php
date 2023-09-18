@@ -56,7 +56,7 @@ trait DBConstraint
      */
     public function setUniqueConstraint(array $stubVariables): bool
     {
-        $sql = "CREATE UNIQUE INDEX uk_".$stubVariables['fieldName']." ON ".$stubVariables['tableName']." (".$stubVariables['fieldName'].");";
+        $sql = "CREATE UNIQUE INDEX ".$stubVariables['tableName']."_".$stubVariables['fieldName']."_unique ON ".$stubVariables['tableName']." (".$stubVariables['fieldName'].");";
         $conn = createConnection();
         if ($conn->query($sql) === Constant::STATUS_TRUE) {
             return Constant::STATUS_TRUE;

@@ -38,15 +38,6 @@ class DBConstraintCheck extends Command
             $io = new SymfonyStyle($input, $output);
             $io->title('PHP DB Auditor');
 
-            foreach ($tableList as $key => $tableName) {
-                $tableLists[] = [$tableName.'<fg=gray>................................................................................................................................</>', $key];
-            }
-
-            $io->table(
-                ['Table Name','<fg=bright-white>Choice Number</>'],
-                $tableLists
-            );
-
             $tableName = $io->choice('Which table would you like to audit?',$tableList);
             $this->displayTable($tableName,$input,$output);
             if (empty($tableName)) {
@@ -128,6 +119,7 @@ class DBConstraintCheck extends Command
 
         foreach ($data['constrain'] as $key => $value) {
             if($value) {
+                $io->newLine();
                 $output->writeln('<fg=bright-green>'.strtoupper($key).'</>');
             }
             foreach ($value as $constrainField) {

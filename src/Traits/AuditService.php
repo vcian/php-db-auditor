@@ -311,6 +311,7 @@ trait AuditService
 
         } catch (Exception $exception) {
             error_log($exception->getMessage());
+            exit;
         }
         return Constant::STATUS_TRUE;
     }
