@@ -2,9 +2,7 @@
 
 namespace Vcian\PhpDbAuditor\Command;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Vcian\PhpDbAuditor\Traits\Rules;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -13,11 +11,11 @@ use Vcian\PhpDbAuditor\Constants\Constant;
 class DBStandardCheck extends Command
 {
     use Rules;
-    protected static $defaultName = 'standard';
+    protected static $defaultName = 'db:standard';
 
     protected function configure()
     {
-        $this->setName('standard')
+        $this->setName('db:standard')
             ->setDescription('Execute the DB standard command')
             ->setHelp('This command executes the standard rules for table.');
     }
@@ -65,6 +63,10 @@ class DBStandardCheck extends Command
         $success = 0;
         $error = 0;
         foreach ($tableStatus as $table) {
+
+            $dotsCount = max(0, 170 - strlen($table['name']));
+            $dots = str_repeat('.', $dotsCount);
+
             if($table['status']) {
                 $status = '<fg=bright-green>✓</>';
                 $success++;
@@ -72,7 +74,7 @@ class DBStandardCheck extends Command
                 $status = '<fg=bright-red>✗</>';
                 $error++;
             }
-            $tableLists[] = [$table['name']. '<fg=bright-blue> ('.$table['size'].' MB)</><fg=gray>...............................................................................................................................</>', $status];
+            $tableLists[] = [$table['name']. '<fg=bright-blue> ('.$table['size'].' MB)</><fg=gray>'.$dots.'</>', $status];
         }
 
         $io->table(

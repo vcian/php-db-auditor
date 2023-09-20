@@ -2,17 +2,11 @@
 
 namespace Vcian\PhpDbAuditor\Command;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Vcian\PhpDbAuditor\Traits\Rules;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Vcian\PhpDbAuditor\Constants\Constant;
-use Vcian\PhpDbAuditor\Traits\Audit;
 use Vcian\PhpDbAuditor\Traits\AuditService;
-use Vcian\PhpDbAuditor\Traits\DBConnection;
-
 class DBConstraintCheck extends Command
 {
     use AuditService;
@@ -21,7 +15,7 @@ class DBConstraintCheck extends Command
 
     protected function configure()
     {
-        $this->setName('constraint')
+        $this->setName('db:constraint')
             ->setDescription('My custom command');
     }
     /**
@@ -106,8 +100,11 @@ class DBConstraintCheck extends Command
         $output->writeln('');
         foreach ($data['fields'] as $field) {
 
+            $dotsCount = max(0, 180 - strlen($field['COLUMN_NAME'].$field['COLUMN_TYPE']));
+            $dots = str_repeat('.', $dotsCount);
+
             $tableLists[] = ['<fg=bright-white>' .$field['COLUMN_NAME'].'</>'.
-                            ' <fg=bright-blue>' .$field['COLUMN_TYPE'].'</>................................................................................................................................................',
+                            ' <fg=bright-blue>' .$field['COLUMN_TYPE'].'</><fg=gray>'.$dots.'</>',
                             '<fg=bright-green>'.$field['DATA_TYPE'].'</>'];
         }
         $io = new SymfonyStyle($input, $output);
@@ -117,21 +114,21 @@ class DBConstraintCheck extends Command
             $tableLists
         );
 
+        $dots = str_repeat('.', 180);
         foreach ($data['constrain'] as $key => $value) {
             if($value) {
                 $io->newLine();
                 $output->writeln('<fg=bright-green>'.strtoupper($key).'</>');
             }
             foreach ($value as $constrainField) {
-                    if($key === 'foreign') {
-                        $output->writeln('<fg=bright-white>'.$constrainField['column_name'].'</><fg=gray>.........................................................................................................................................................</>'.
-                        '<fg=blue>'.$constrainField['foreign_table_name'].'</>'.' <fg=bright-green>'.$constrainField['foreign_column_name'].'</>');
-                    } else {
-                        $output->writeln('<fg=bright-white>'.$constrainField.'</><fg=gray>.................................................................................................................................................................</>');
-                    }
+                if($key === 'foreign') {
+                    $output->writeln('<fg=bright-white>'.$constrainField['column_name'].'</><fg=gray>'.$dots.'</>'.
+                    '<fg=blue>'.$constrainField['foreign_table_name'].'</>'.' <fg=bright-green>'.$constrainField['foreign_column_name'].'</>');
+                } else {
+                    $output->writeln('<fg=bright-white>'.$constrainField.'</><fg=gray>'.$dots.'</>');
+                }
             }
         }
-        // echo "<pre>"; print_r($data);die;
         return Constant::STATUS_TRUE;
     }
 
@@ -181,20 +178,20 @@ class DBConstraintCheck extends Command
             }
         }
         if (!$this->skip) {
-            $output->writeln('.-"""-.
-                            / .===. \
-                            \/ 6 6 \/
-                            ( \___/ )
-             ____________ooo_\_____/______________________
-            /                                                \
-            |   <fg=bright-green>Congratulations! Constraint Added Successfully.|</>
-            \______________________________ooo_________________/
-                             |  |  |
-                             |_ | _|
-                             |  |  |
-                             |__|__|
-                             /-`Y`-\
-                             (__/ \__)');
+            $output->writeln('                                     .-"""-.
+                                    / .===. \
+                                    \/ 6 6 \/
+                                    ( \___/ )
+                     ____________ooo_\_____/________________________
+                    /                                               \
+                    | <fg=bright-green>Congratulations! Constraint Added Successfully.|</>
+                    \______________________________ooo______________/
+                                     |  |  |
+                                     |_ | _|
+                                     |  |  |
+                                     |__|__|
+                                     /-`Y`-\
+                                    (__/ \__)');
 
             $this->displayTable($tableName, $input, $output);
         }
@@ -244,8 +241,9 @@ class DBConstraintCheck extends Command
             $this->skip = Constant::STATUS_TRUE;
         }
 
+        $dots = str_repeat('.', 160);
         if ($referenceFieldType['data_type'] !== $selectedFieldType['data_type']) {
-            $output->writeln("<fg=bright-green>".$selectedFieldType['data_type']."</> <fg=bright-blue>".$selectField."</>...........................................................................................................................................<fg=bright-blue>".$referenceField."</> <fg=bright-green>".$referenceFieldType['data_type']."</>");
+            $output->writeln("<fg=bright-green>".$selectedFieldType['data_type']."</> <fg=bright-blue>".$selectField."</><fg=gray>".$dots."</><fg=bright-blue>".$referenceField."</> <fg=bright-green>".$referenceFieldType['data_type']."</>");
             $output->writeln("");
             $io->error('Columns must have the same datatype.');
             $this->skip = Constant::STATUS_TRUE;

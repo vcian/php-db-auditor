@@ -9,8 +9,15 @@
 ## Usage:
 
 ---
-> #### **php app standard**
+> #### **php app db:standard**
 >
 > This command give you result with list of table with standard follow indication.
 >
 >
+
+> #### **php app db:constraint**
+>
+> This command gives you result with list of tables with primary,foreign,unique,index constraint.
+>
+>
+> You can add more constraint to the table by seeing existing constraint with table.
