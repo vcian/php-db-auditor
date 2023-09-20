@@ -5,6 +5,9 @@
 - DB Auditor scan your mysql database and give insights of mysql standards, constraints and provide option to add the constraints through CLI.
 - The result of audit process shows list of tables & columns which doesn't have proper standards.
 
+## Installation & Usage
+
+> **Requires [PHP 8.1+](https://php.net/releases/)
 
 ## Usage:
 
