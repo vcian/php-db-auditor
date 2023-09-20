@@ -18,7 +18,7 @@ You can see DB Auditor commands using below command.
 >
 **Note:**
 
-If you want to check standalone feature then you can execute below artisan command one by one.
+If you want to check standalone feature then you can execute below php command one by one.
 > #### **php app db:standard**
 >
 > This command give you result with list of table with standard follow indication.
