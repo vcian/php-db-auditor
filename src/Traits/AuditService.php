@@ -86,9 +86,6 @@ trait AuditService
         $conn = createConnection();
         $fields = Constant::ARRAY_DECLARATION;
         try {
-            // $fieldList = DB::select("SELECT * FROM `INFORMATION_SCHEMA`.`COLUMNS`
-            // WHERE `TABLE_SCHEMA`= '" . env('DB_DATABASE') . "' AND `TABLE_NAME`= '" . $tableName . "' AND `COLUMN_KEY` = '' ");
-
             $query = $conn->query("SELECT * FROM `INFORMATION_SCHEMA`.`COLUMNS`
             WHERE `TABLE_SCHEMA`= '" . DB_NAME . "' AND `TABLE_NAME`= '" . $tableName . "' AND `COLUMN_KEY` = '' ");
             $fieldList = $query->fetch_all(MYSQLI_ASSOC);

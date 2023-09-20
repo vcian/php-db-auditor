@@ -10,8 +10,15 @@
 > **Requires [PHP 8.1+](https://php.net/releases/)
 
 ## Usage:
+You can see DB Auditor commands using below command.
 
----
+> #### **php app**
+>
+> This command provides a list of available commands for database selection, such as checking database standards or verifying constraints.
+>
+**Note:**
+
+If you want to check standalone feature then you can execute below artisan command one by one.
 > #### **php app db:standard**
 >
 > This command give you result with list of table with standard follow indication.

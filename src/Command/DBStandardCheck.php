@@ -17,7 +17,7 @@ class DBStandardCheck extends Command
     {
         $this->setName('db:standard')
             ->setDescription('Execute the DB standard command')
-            ->setHelp('This command executes the standard rules for table.');
+            ->setHelp('This command give you result with list of table with standard follow indication.');
     }
     /**
      * Execute command to check the standard of tables.
