@@ -93,10 +93,10 @@ class DBConstraintCheck extends Command
             ]
         ];
 
-        $output->writeln('TABLE NAME: <fg=blue>'.$data['table'].'</>');
+        $output->writeln(' TABLE NAME: <fg=blue>'.$data['table'].'</>');
         $output->writeln('');
-        $output->writeln('<fg=bright-green>Columns</><fg=bright-white> => '.$data['field_count'].'</>');
-        $output->writeln('<fg=bright-green>Table Size</><fg=bright-white> => '.$data['size'].'</>');
+        $output->writeln(' <fg=bright-green>Columns</><fg=bright-white> => '.$data['field_count'].'</>');
+        $output->writeln(' <fg=bright-green>Table Size</><fg=bright-white> => '.$data['size'].'</>');
         $output->writeln('');
         foreach ($data['fields'] as $field) {
 
@@ -118,14 +118,14 @@ class DBConstraintCheck extends Command
         foreach ($data['constrain'] as $key => $value) {
             if($value) {
                 $io->newLine();
-                $output->writeln('<fg=bright-green>'.strtoupper($key).'</>');
+                $output->writeln(' <fg=bright-green>'.strtoupper($key).'</>');
             }
             foreach ($value as $constrainField) {
                 if($key === 'foreign') {
-                    $output->writeln('<fg=bright-white>'.$constrainField['column_name'].'</><fg=gray>'.$dots.'</>'.
+                    $output->writeln(' <fg=bright-white>'.$constrainField['column_name'].'</><fg=gray>'.$dots.'</>'.
                     '<fg=blue>'.$constrainField['foreign_table_name'].'</>'.' <fg=bright-green>'.$constrainField['foreign_column_name'].'</>');
                 } else {
-                    $output->writeln('<fg=bright-white>'.$constrainField.'</><fg=gray>'.$dots.'</>');
+                    $output->writeln(' <fg=bright-white>'.$constrainField.'</><fg=gray>'.$dots.'</>');
                 }
             }
         }
@@ -145,7 +145,7 @@ class DBConstraintCheck extends Command
             $tableHasValue = $this->tableHasValue($tableName);
 
             if ($tableHasValue) {
-                $output->writeln('<fg=bright-red>Can not apply '.strtolower($selectConstrain).' key | Please truncate table.</>');
+                $output->writeln(' <fg=bright-red>Can not apply '.strtolower($selectConstrain).' key | Please truncate table.</>');
             }
         }
 
@@ -159,7 +159,7 @@ class DBConstraintCheck extends Command
             if ($selectConstrain === Constant::CONSTRAINT_UNIQUE_KEY) {
                 $fields = $this->getUniqueFields($tableName, $noConstraintFields['mix']);
                 if (empty($fields)) {
-                    $output->writeln("<fg=bright-red>All field values are duplicate. You can't add unique constraint.</>");
+                    $output->writeln(" <fg=bright-red>All field values are duplicate. You can't add unique constraint.</>");
                 }
             }
 
@@ -243,7 +243,7 @@ class DBConstraintCheck extends Command
 
         $dots = str_repeat('.', 160);
         if ($referenceFieldType['data_type'] !== $selectedFieldType['data_type']) {
-            $output->writeln("<fg=bright-green>".$selectedFieldType['data_type']."</> <fg=bright-blue>".$selectField."</><fg=gray>".$dots."</><fg=bright-blue>".$referenceField."</> <fg=bright-green>".$referenceFieldType['data_type']."</>");
+            $output->writeln(" <fg=bright-green>".$selectedFieldType['data_type']."</> <fg=bright-blue>".$selectField."</><fg=gray>".$dots."</><fg=bright-blue>".$referenceField."</> <fg=bright-green>".$referenceFieldType['data_type']."</>");
             $output->writeln("");
             $io->error('Columns must have the same datatype.');
             $this->skip = Constant::STATUS_TRUE;

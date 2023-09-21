@@ -187,87 +187,10 @@ trait DBConnection
         return Constant::STATUS_FALSE;
     }
 
-    /**
-     * Check Field Has Index Constraint
-     * @param string $tableName
-     * @param string $fieldName
-     * @return bool
-     */
-    public function checkFieldHasIndex(string $tableName, string $fieldName): bool
-    {
-        try {
-            $query = "SHOW INDEX FROM ".$this->getDatabaseName().".".$tableName."";
-            $fieldConstraints = DB::select($query);
-
-            foreach($fieldConstraints as $fieldConstraint) {
-                if($fieldConstraint->Column_name === $fieldName && str_contains($fieldConstraint->Key_name, 'index')) {
-                    return Constant::STATUS_TRUE;
-                }
-            }
-        } catch (Exception $exception) {
-            error_log($exception->getMessage());;
-        }
-        return Constant::STATUS_FALSE;
-    }
-
     public function getDatabaseName()
     {
         $conn = createConnection();
         $databaseName = $conn->query("SELECT DATABASE()")->fetch_row()[0];
         return $databaseName;
-    }
-
-    public function getDatabaseSize()
-    {
-        try {
-            $query = 'SELECT table_schema as db_name, ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) "size"
-                FROM information_schema.tables
-                where table_schema = "'. $this->getDatabaseName() .'" GROUP BY table_schema';
-
-            $result = DB::select($query);
-
-            if ($result) {
-                return $result[0]->size;
-            }
-        } catch (Exception $exception) {
-            error_log($exception->getMessage());;
-        }
-        return Constant::NULL;
-
-    }
-
-    public function getDatabaseEngin()
-    {
-        try {
-            $query = 'SELECT engine FROM information_schema.Tables where TABLE_SCHEMA = "'. $this->getDatabaseName() .'" Limit 1';
-
-            $result = DB::select($query);
-
-            if ($result) {
-                return $result[0]->ENGINE;
-            }
-
-        } catch (Exception $exception) {
-            error_log($exception->getMessage());;
-        }
-        return Constant::NULL;
-    }
-
-    public function getCharacterSetName()
-    {
-        try {
-            $query = 'SELECT DEFAULT_CHARACTER_SET_NAME
-                    FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "'. $this->getDatabaseName() .'"';
-
-            $result = DB::select($query);
-
-            if ($result) {
-                return $result[0]->DEFAULT_CHARACTER_SET_NAME;
-            }
-
-        } catch (Exception $exception) {
-            error_log($exception->getMessage());;
-        }
-        return Constant::NULL;
     }
 }

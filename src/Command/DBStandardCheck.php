@@ -51,6 +51,12 @@ class DBStandardCheck extends Command
             } else {
                 self::failStandardTable($tableStatus, $io);
             }
+
+            $report = $io->confirm("Do you want see other table report?");
+
+            if (!$report) {
+                $continue = Constant::STATUS_FALSE;
+            }
         } while ($continue === Constant::STATUS_TRUE);
 
         return Command::SUCCESS;
@@ -82,15 +88,16 @@ class DBStandardCheck extends Command
             $tableLists
         );
 
-        $output->writeln('<fg=bright-green><bg=green>'.$success.'</> TABLE PASSED ✓</>');
-        $output->writeln('<fg=bright-red><bg=red>'.$error.'</> TABLE FAILED ✗</>');
+        $output->writeln('  <fg=bright-green><bg=green>'.$success.'</> TABLE PASSED ✓</>');
+        $output->writeln('  <fg=bright-red><bg=red>'.$error.'</> TABLE FAILED ✗</>');
+        $io->newLine();
 
     }
     /**
      * Check table rules, datatypes and suggestions
      */
     public function failStandardTable($tableStatus, $io) : void {
-        $io->text('TABLE NAME :'. str_replace('_', ' ', $tableStatus['table']));
+        $io->text('TABLE NAME : <fg=bright-blue>'. str_replace('_', ' ', $tableStatus['table'])."</>");
         $io->newLine();
 
         $io->text('suggestion(s)');
@@ -99,18 +106,21 @@ class DBStandardCheck extends Command
         foreach ($tableStatus['table_comment'] as $comment) {
             $io->text('1. <fg=bright-yellow>'.$comment.'</>');
         }
-
+        $handEmoji = "\u{1F449}";
+        // echo "<pre>"; print_r($tableStatus);die;
         foreach ($tableStatus['fields'] as $key => $field) {
 
             if ((isset($field['suggestion']) && isset($field['datatype']) && count($field) === 2) || count($field) === 1) {
                 $stanradCheck = '<fg=bright-green>✓</>';
-                $suggestion = isset($field['suggestion'])?$field['suggestion']:"";
+                $suggestion = isset($field['suggestion'])?$handEmoji.'  '.$field['suggestion']:"";
+                $fieldName = $key;
             } else {
                 $stanradCheck = '<fg=bright-red>✗</>';
-                $suggestion = isset($field[0])?$field[0]:"";
+                $suggestion = isset($field[0])?$handEmoji.'  '.$field[0]:"";
+                $fieldName = '<fg=bright-red>'.$key.'</>';
             }
 
-            $reportLists[] = [ $key, $stanradCheck , $field['datatype']['data_type'] ?? "-", $field['datatype']['size'] ?? "-", '<fg=yellow>'.$suggestion.'</>'?? "-" ];
+            $reportLists[] = [ $fieldName, $stanradCheck , $field['datatype']['data_type'] ?? "-", $field['datatype']['size'] ?? "-", '<fg=bright-yellow>'. $suggestion.'</>'?? "-" ];
 
             if(isset($field['datatype'])) {
                 unset($field['datatype']);
