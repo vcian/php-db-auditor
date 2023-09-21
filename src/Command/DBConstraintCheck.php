@@ -3,8 +3,10 @@
 namespace Vcian\PhpDbAuditor\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Terminal;
 use Vcian\PhpDbAuditor\Constants\Constant;
 use Vcian\PhpDbAuditor\Traits\AuditService;
 class DBConstraintCheck extends Command
@@ -98,10 +100,18 @@ class DBConstraintCheck extends Command
         $output->writeln(' <fg=bright-green>Columns</><fg=bright-white> => '.$data['field_count'].'</>');
         $output->writeln(' <fg=bright-green>Table Size</><fg=bright-white> => '.$data['size'].'</>');
         $output->writeln('');
-        foreach ($data['fields'] as $field) {
 
-            $dotsCount = max(0, 180 - strlen($field['COLUMN_NAME'].$field['COLUMN_TYPE']));
-            $dots = str_repeat('.', $dotsCount);
+        // Get the terminal width
+        $terminal = new Terminal();
+        $terminalWidth = $terminal->getWidth();
+
+        $columnHeaders = ['Table Name', '<fg=bright-white>Data type</>'];
+        // Calculate the size of the dotted line based on the terminal width
+        $totalWidth = $terminalWidth - strlen($columnHeaders[0]) - strlen($columnHeaders[1]);
+        $dotsCount = max(0, $totalWidth);
+        $dots = str_repeat('.', 80);
+
+        foreach ($data['fields'] as $field) {
 
             $tableLists[] = ['<fg=bright-white>' .$field['COLUMN_NAME'].'</>'.
                             ' <fg=bright-blue>' .$field['COLUMN_TYPE'].'</><fg=gray>'.$dots.'</>',
@@ -114,7 +124,7 @@ class DBConstraintCheck extends Command
             $tableLists
         );
 
-        $dots = str_repeat('.', 180);
+
         foreach ($data['constrain'] as $key => $value) {
             if($value) {
                 $io->newLine();
@@ -241,7 +251,16 @@ class DBConstraintCheck extends Command
             $this->skip = Constant::STATUS_TRUE;
         }
 
-        $dots = str_repeat('.', 160);
+        // Get the terminal width
+        $terminal = new Terminal();
+        $terminalWidth = $terminal->getWidth();
+
+        $columnHeaders = ['Table Name', '<fg=bright-white>Data type</>'];
+        // Calculate the size of the dotted line based on the terminal width
+        $totalWidth = $terminalWidth - strlen($columnHeaders[0]) - strlen($columnHeaders[1]);
+        $dotsCount = max(0, $totalWidth);
+        $dots = str_repeat('.', 80);
+
         if ($referenceFieldType['data_type'] !== $selectedFieldType['data_type']) {
             $output->writeln(" <fg=bright-green>".$selectedFieldType['data_type']."</> <fg=bright-blue>".$selectField."</><fg=gray>".$dots."</><fg=bright-blue>".$referenceField."</> <fg=bright-green>".$referenceFieldType['data_type']."</>");
             $output->writeln("");

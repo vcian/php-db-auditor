@@ -9,6 +9,17 @@
 
 > **Requires [PHP 8.1+](https://php.net/releases/)
 
+You can download this package using git clone
+
+    git clone "repo url"
+
+After the cloned run the following commands
+
+    cd php-db-auditor
+
+Need to install dependency using [Composer](https://getcomposer.org):
+> #### **composer install**
+
 ## Usage:
 You can see DB Auditor commands using below command.
 

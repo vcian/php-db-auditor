@@ -4,6 +4,7 @@ namespace Vcian\PhpDbAuditor\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Terminal;
 use Vcian\PhpDbAuditor\Traits\Rules;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Vcian\PhpDbAuditor\Constants\Constant;
@@ -68,9 +69,10 @@ class DBStandardCheck extends Command
     public function checkStandard($tableStatus, $io, $output) : void {
         $success = 0;
         $error = 0;
+
         foreach ($tableStatus as $table) {
 
-            $dotsCount = max(0, 170 - strlen($table['name']));
+            $dotsCount = max(0, 110 - strlen($table['name']));
             $dots = str_repeat('.', $dotsCount);
 
             if($table['status']) {
