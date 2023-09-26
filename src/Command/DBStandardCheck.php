@@ -8,6 +8,7 @@ use Symfony\Component\Console\Terminal;
 use Vcian\PhpDbAuditor\Traits\Rules;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Vcian\PhpDbAuditor\Constants\Constant;
+use function Termwind\{render};
 
 class DBStandardCheck extends Command
 {
@@ -33,7 +34,7 @@ class DBStandardCheck extends Command
 
         $io = new SymfonyStyle($input, $output);
         $io->title('PHP DB Auditor');
-        self::checkStandard($tableStatus, $io, $output);
+        self::checkStandard($tableStatus, $io);
 
         $continue = Constant::STATUS_TRUE;
 
@@ -41,14 +42,13 @@ class DBStandardCheck extends Command
             $tableName = $io->ask('Please enter table name if you want to see the table report');
 
             if (empty($tableName)) {
-                $output->writeln('<fg=bright-red>No Table Found</>');
+                self::errorMessage($io);
                 return Constant::STATUS_FALSE;
             }
 
             $tableStatus = $this->tableRules($tableName);
             if (!$tableStatus) {
-                $output->writeln('<fg=bright-red>No Table Found</>');
-                return Constant::STATUS_FALSE;
+                self::errorMessage($io);
             } else {
                 self::failStandardTable($tableStatus, $io);
             }
@@ -66,73 +66,47 @@ class DBStandardCheck extends Command
     /**
      * Check multiple table standardization
      */
-    public function checkStandard($tableStatus, $io, $output) : void {
-        $success = 0;
-        $error = 0;
+    public function checkStandard($tableStatus, $io) : void {
 
-        foreach ($tableStatus as $table) {
+        $viewFilePath = __DIR__ . '/../views/standard.php';
 
-            $dotsCount = max(0, 110 - strlen($table['name']));
-            $dots = str_repeat('.', $dotsCount);
-
-            if($table['status']) {
-                $status = '<fg=bright-green>✓</>';
-                $success++;
-            } else {
-                $status = '<fg=bright-red>✗</>';
-                $error++;
-            }
-            $tableLists[] = [$table['name']. '<fg=bright-blue> ('.$table['size'].' MB)</><fg=gray>'.$dots.'</>', $status];
+        if (file_exists($viewFilePath)) {
+            ob_start();
+            include $viewFilePath;
+            $viewContent = ob_get_clean();
+        } else {
+            $io->error('View file not found: '.$viewFilePath);
         }
-
-        $io->table(
-            ['Table Name', '<fg=bright-white>Standardization</>'],
-            $tableLists
-        );
-
-        $output->writeln('  <fg=bright-green><bg=green>'.$success.'</> TABLE PASSED ✓</>');
-        $output->writeln('  <fg=bright-red><bg=red>'.$error.'</> TABLE FAILED ✗</>');
-        $io->newLine();
-
+        render($viewContent);
     }
     /**
      * Check table rules, datatypes and suggestions
      */
     public function failStandardTable($tableStatus, $io) : void {
-        $io->text('TABLE NAME : <fg=bright-blue>'. str_replace('_', ' ', $tableStatus['table'])."</>");
-        $io->newLine();
 
-        $io->text('suggestion(s)');
-        $io->newLine();
+        $viewFilePath = __DIR__ . '/../views/fail_standard_table.php';
 
-        foreach ($tableStatus['table_comment'] as $comment) {
-            $io->text('1. <fg=bright-yellow>'.$comment.'</>');
+        if (file_exists($viewFilePath)) {
+            ob_start();
+            include $viewFilePath;
+            $viewContent = ob_get_clean();
+        } else {
+            $io->error('View file not found: '.$viewFilePath);
         }
-        $handEmoji = "\u{1F449}";
-        // echo "<pre>"; print_r($tableStatus);die;
-        foreach ($tableStatus['fields'] as $key => $field) {
+        render($viewContent);
+    }
 
-            if ((isset($field['suggestion']) && isset($field['datatype']) && count($field) === 2) || count($field) === 1) {
-                $stanradCheck = '<fg=bright-green>✓</>';
-                $suggestion = isset($field['suggestion'])?$handEmoji.'  '.$field['suggestion']:"";
-                $fieldName = $key;
-            } else {
-                $stanradCheck = '<fg=bright-red>✗</>';
-                $suggestion = isset($field[0])?$handEmoji.'  '.$field[0]:"";
-                $fieldName = '<fg=bright-red>'.$key.'</>';
-            }
+    public function errorMessage($io) : void {
+        $viewFilePath = __DIR__ . '/../views/error_message.php';
 
-            $reportLists[] = [ $fieldName, $stanradCheck , $field['datatype']['data_type'] ?? "-", $field['datatype']['size'] ?? "-", '<fg=bright-yellow>'. $suggestion.'</>'?? "-" ];
-
-            if(isset($field['datatype'])) {
-                unset($field['datatype']);
-            }
+        if (file_exists($viewFilePath)) {
+            $message = "No Table Found";
+            ob_start();
+            include $viewFilePath;
+            $viewContent = ob_get_clean();
+        } else {
+            $io->error('View file not found: '.$viewFilePath);
         }
-
-        $io->table(
-            ['field name', 'standard check', 'datatype', 'size', 'suggestion(s)'],
-            $reportLists
-        );
-
+        render($viewContent);
     }
 }

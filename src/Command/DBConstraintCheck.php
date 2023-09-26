@@ -9,6 +9,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Terminal;
 use Vcian\PhpDbAuditor\Constants\Constant;
 use Vcian\PhpDbAuditor\Traits\AuditService;
+use function Termwind\{render};
 class DBConstraintCheck extends Command
 {
     use AuditService;
@@ -35,7 +36,7 @@ class DBConstraintCheck extends Command
             $io->title('PHP DB Auditor');
 
             $tableName = $io->choice('Which table would you like to audit?',$tableList);
-            $this->displayTable($tableName,$input,$output);
+            self::displayTable($tableName,$io);
             if (empty($tableName)) {
                 $output->writeln('<fg=bright-red>No Table Found</>');
                 return Constant::STATUS_FALSE;
@@ -80,7 +81,7 @@ class DBConstraintCheck extends Command
      * @param string $tableName
      * @return void
      */
-    public function displayTable(string $tableName,$input,$output): string
+    public function displayTable(string $tableName, $io): void
     {
         $data = [
             "table" => $tableName,
@@ -95,51 +96,16 @@ class DBConstraintCheck extends Command
             ]
         ];
 
-        $output->writeln(' TABLE NAME: <fg=blue>'.$data['table'].'</>');
-        $output->writeln('');
-        $output->writeln(' <fg=bright-green>Columns</><fg=bright-white> => '.$data['field_count'].'</>');
-        $output->writeln(' <fg=bright-green>Table Size</><fg=bright-white> => '.$data['size'].'</>');
-        $output->writeln('');
+        $viewFilePath = __DIR__ . '/../views/constraint.php';
 
-        // Get the terminal width
-        $terminal = new Terminal();
-        $terminalWidth = $terminal->getWidth();
-
-        $columnHeaders = ['Table Name', '<fg=bright-white>Data type</>'];
-        // Calculate the size of the dotted line based on the terminal width
-        $totalWidth = $terminalWidth - strlen($columnHeaders[0]) - strlen($columnHeaders[1]);
-        $dotsCount = max(0, $totalWidth);
-        $dots = str_repeat('.', 80);
-
-        foreach ($data['fields'] as $field) {
-
-            $tableLists[] = ['<fg=bright-white>' .$field['COLUMN_NAME'].'</>'.
-                            ' <fg=bright-blue>' .$field['COLUMN_TYPE'].'</><fg=gray>'.$dots.'</>',
-                            '<fg=bright-green>'.$field['DATA_TYPE'].'</>'];
+        if (file_exists($viewFilePath)) {
+            ob_start();
+            include $viewFilePath;
+            $viewContent = ob_get_clean();
+        } else {
+            $io->error('View file not found: '.$viewFilePath);
         }
-        $io = new SymfonyStyle($input, $output);
-        $io->table(
-            ['<fg=bright-green>Fields</>',
-            '<fg=bright-white>DataType</>'],
-            $tableLists
-        );
-
-
-        foreach ($data['constrain'] as $key => $value) {
-            if($value) {
-                $io->newLine();
-                $output->writeln(' <fg=bright-green>'.strtoupper($key).'</>');
-            }
-            foreach ($value as $constrainField) {
-                if($key === 'foreign') {
-                    $output->writeln(' <fg=bright-white>'.$constrainField['column_name'].'</><fg=gray>'.$dots.'</>'.
-                    '<fg=blue>'.$constrainField['foreign_table_name'].'</>'.' <fg=bright-green>'.$constrainField['foreign_column_name'].'</>');
-                } else {
-                    $output->writeln(' <fg=bright-white>'.$constrainField.'</><fg=gray>'.$dots.'</>');
-                }
-            }
-        }
-        return Constant::STATUS_TRUE;
+        render($viewContent);
     }
 
     /**
@@ -188,22 +154,8 @@ class DBConstraintCheck extends Command
             }
         }
         if (!$this->skip) {
-            $output->writeln('                                     .-"""-.
-                                    / .===. \
-                                    \/ 6 6 \/
-                                    ( \___/ )
-                     ____________ooo_\_____/________________________
-                    /                                               \
-                    | <fg=bright-green>Congratulations! Constraint Added Successfully.|</>
-                    \______________________________ooo______________/
-                                     |  |  |
-                                     |_ | _|
-                                     |  |  |
-                                     |__|__|
-                                     /-`Y`-\
-                                    (__/ \__)');
-
-            $this->displayTable($tableName, $input, $output);
+            self::successMessage('Congratulations! Constraint Added Successfully.',$io);
+            self::displayTable($tableName, $input);
         }
     }
 
@@ -269,5 +221,23 @@ class DBConstraintCheck extends Command
         } else {
             $this->addConstraint($tableName, $selectField, Constant::CONSTRAINT_FOREIGN_KEY, $referenceTable, $referenceField);
         }
+    }
+
+    /**
+     * Display success messages
+     * @param string $message
+     */
+    public function successMessage(string $message,$io): void
+    {
+        $viewFilePath = __DIR__ . '/../views/success_message.php';
+
+        if (file_exists($viewFilePath)) {
+            ob_start();
+            include $viewFilePath;
+            $viewContent = ob_get_clean();
+        } else {
+            $io->error('View file not found: '.$viewFilePath);
+        }
+        render($viewContent);
     }
 }
