@@ -193,4 +193,64 @@ trait DBConnection
         $databaseName = $conn->query("SELECT DATABASE()")->fetch_row()[0];
         return $databaseName;
     }
+
+    public function getDatabaseSize()
+    {
+        try {
+            $conn = createConnection();
+            $query = 'SELECT table_schema as db_name, ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) "size"
+                FROM information_schema.tables
+                where table_schema = "'. $this->getDatabaseName() .'" GROUP BY table_schema';
+
+            $query = $conn->query($query);
+            $result = $query->fetch_assoc();
+            if ($result) {
+                return $result['size'];
+            }
+        } catch (Exception $exception) {
+            error_log($exception->getMessage());
+        }
+        return Constant::NULL;
+
+    }
+
+    public function getDatabaseEngin()
+    {
+        try {
+            $conn = createConnection();
+            $query = 'SELECT engine FROM information_schema.Tables where TABLE_SCHEMA = "'. $this->getDatabaseName() .'" Limit 1';
+
+            $query = $conn->query($query);
+            $result = $query->fetch_assoc();
+
+            if ($result) {
+                return $result['ENGINE'];
+            }
+
+        } catch (Exception $exception) {
+            error_log($exception->getMessage());
+        }
+        return Constant::NULL;
+    }
+
+    public function getCharacterSetName()
+    {
+        try {
+
+            $conn = createConnection();
+            $query = 'SELECT DEFAULT_CHARACTER_SET_NAME
+            FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "'. $this->getDatabaseName() .'"';
+
+            $query = $conn->query($query);
+            $result = $query->fetch_assoc();
+
+            if ($result) {
+                return $result['DEFAULT_CHARACTER_SET_NAME'];
+            }
+
+        } catch (Exception $exception) {
+            error_log($exception->getMessage());
+        }
+        return Constant::NULL;
+    }
 }

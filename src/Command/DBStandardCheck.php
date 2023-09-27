@@ -4,7 +4,6 @@ namespace Vcian\PhpDbAuditor\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Terminal;
 use Vcian\PhpDbAuditor\Traits\Rules;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Vcian\PhpDbAuditor\Constants\Constant;
@@ -18,8 +17,7 @@ class DBStandardCheck extends Command
     protected function configure()
     {
         $this->setName('db:standard')
-            ->setDescription('Execute the DB standard command')
-            ->setHelp('This command give you result with list of table with standard follow indication.');
+            ->setDescription('This command provides a list of available commands for database selection, such as checking database standards or verifying constraints');
     }
     /**
      * Execute command to check the standard of tables.

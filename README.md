@@ -42,3 +42,9 @@ If you want to check standalone feature then you can execute below php command o
 >
 >
 > You can add more constraint to the table by seeing existing constraint with table.
+
+> #### **php app db:summary**
+>
+> This command provides you with information about the database, including its name, size, table count, and character set.
+>
+>
