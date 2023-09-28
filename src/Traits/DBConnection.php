@@ -223,7 +223,7 @@ trait DBConnection
             $query = $conn->query($query);
             $result = $query->fetch_assoc();
 
-            if ($result) {
+            if (isset($result['ENGINE']) && !empty($result['ENGINE'])) {
                 return $result['ENGINE'];
             }
 
