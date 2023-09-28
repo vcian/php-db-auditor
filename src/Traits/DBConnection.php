@@ -116,7 +116,7 @@ trait DBConnection
 
             // Fetch the results as an associative array
             $result = $query->fetch_all(MYSQLI_ASSOC);
-            if ($result) {
+            if (isset($result) && !empty($result)) {
                 return $result[0]['size'];
             }
 
@@ -244,7 +244,7 @@ trait DBConnection
             $query = $conn->query($query);
             $result = $query->fetch_assoc();
 
-            if ($result) {
+            if (isset($result['DEFAULT_CHARACTER_SET_NAME']) && !empty($result['DEFAULT_CHARACTER_SET_NAME'])) {
                 return $result['DEFAULT_CHARACTER_SET_NAME'];
             }
 
