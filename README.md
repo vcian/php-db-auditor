@@ -5,7 +5,6 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/vcian/php-db-auditor
 )](https://packagist.org/packages/vcian/php-db-auditor)
 
-
 ## Introduction
 
 - This package provides to audit process of reviewing and evaluating a mysql database system.
