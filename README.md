@@ -7,9 +7,25 @@
 
 ## Introduction
 
-- This package provides to audit process of reviewing and evaluating a mysql database system.
-- DB Auditor scan your mysql database and give insights of mysql standards, constraints and provide option to add the constraints through CLI.
-- The result of audit process shows list of tables & columns which doesn't have proper standards.
+- Introducing "PHP DB Auditor" – your go-to solution for meticulous MySQL database system auditing. This powerful PHP package is your key to ensuring the utmost integrity and compliance with MySQL standards and constraints in your database. Dive into the world of database auditing with ease, thanks to its user-friendly command-line interface (CLI).
+
+## Key Points
+
+1. Comprehensive Auditing: PHP DB Auditor is a specialized PHP package designed to perform comprehensive audits on MySQL database systems.
+
+2. Thorough Evaluation: It conducts a thorough and detailed evaluation of the entire MySQL database structure.
+
+3. Standards Compliance: The package employs advanced scanning techniques to assess the database's adherence to MySQL standards and constraints.
+
+4. Command-Line Interface (CLI): Users can effortlessly interact with PHP DB Auditor through its intuitive command-line interface, making the auditing process seamless.
+
+5. Constraint Management: PHP DB Auditor empowers you to add essential constraints directly to your MySQL database via the CLI.
+
+6. Detailed Audit Report: Upon completion of the auditing process, the package generates a detailed report.
+
+7. Identifying Non-Compliance: The audit report provides a comprehensive list of tables and columns that fall short of meeting established MySQL standards and constraints.
+
+8. Database Integrity: With PHP DB Auditor, you can proactively maintain the integrity of your database and ensure it aligns with the necessary standards.
 
 ## Installation & Usage
 
