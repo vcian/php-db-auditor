@@ -71,7 +71,7 @@ class DBConstraintCheck extends Command
             }
 
         } catch (\Exception $exception) {
-            $io->error($exception->getMessage());
+            $output->writeln($exception->getMessage());
         }
 
         return Command::SUCCESS;
