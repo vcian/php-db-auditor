@@ -36,6 +36,7 @@ class DBConstraintCheck extends Command
             $io->title('PHP DB Auditor');
 
             $tableName = $io->choice('Which table would you like to audit?',$tableList);
+            self::displaySpinner($output);
             self::displayTable($tableName,$io);
             if (empty($tableName)) {
                 $output->writeln('<fg=bright-red>No Table Found</>');
@@ -239,5 +240,26 @@ class DBConstraintCheck extends Command
             $io->error('View file not found: '.$viewFilePath);
         }
         render($viewContent);
+    }
+
+    /**
+     * Display loading messages
+     */
+    public function displaySpinner($output): bool {
+        // Display a spinner at the beginning
+        $spinner = ['-', '\\', '|', '/'];
+        $spinnerIndex = 0;
+        $output->write('  Loading...');
+
+        // Simulate some time-consuming task
+        for ($i = 0; $i < 10; $i++) {
+            usleep(100000); // Sleep for 100 milliseconds
+
+            // Update the spinner
+            $output->write("\x08" . $spinner[$spinnerIndex]);
+            $spinnerIndex = ($spinnerIndex + 1) % 4;
+        }
+
+        return Constant::STATUS_TRUE;
     }
 }
