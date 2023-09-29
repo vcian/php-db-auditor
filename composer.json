@@ -1,5 +1,22 @@
 {
     "name": "vcian/php-db-auditor",
+    "description": "Database DB Auditor provide leverage to audit your MySql database standards and also provide options to add constraints in table.",
+    "keywords": [
+        "Php",
+        "MySql",
+        "DB Audit",
+        "Database",
+        "DB Standards",
+        "DB Constraints"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vcian - ViitorCloud",
+            "homepage": "https://github.com/vcian"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Vcian\\PhpDbAuditor\\": "src/"
@@ -7,6 +24,10 @@
     },
     "require": {
         "symfony/console": "^6.3",
+        "php": "^8.1",
+        "doctrine/dbal": "^3.6",
         "nunomaduro/termwind": "^1.15"
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
