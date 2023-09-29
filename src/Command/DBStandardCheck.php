@@ -31,6 +31,8 @@ class DBStandardCheck extends Command
         }
 
         $io = new SymfonyStyle($input, $output);
+        self::displaySpinner($output);
+        $io->newLine();
         $io->title('PHP DB Auditor');
         self::checkStandard($tableStatus, $io);
 
@@ -48,6 +50,7 @@ class DBStandardCheck extends Command
             if (!$tableStatus) {
                 self::errorMessage($io);
             } else {
+                self::displaySpinner($output);
                 self::failStandardTable($tableStatus, $io);
             }
 
@@ -106,5 +109,26 @@ class DBStandardCheck extends Command
             $io->error('View file not found: '.$viewFilePath);
         }
         render($viewContent);
+    }
+
+    /**
+     * Display loading messages
+     */
+    public function displaySpinner($output): bool {
+        // Display a spinner at the beginning
+        $spinner = ['-', '\\', '|', '/'];
+        $spinnerIndex = 0;
+        $output->write('Loading...');
+
+        // Simulate some time-consuming task
+        for ($i = 0; $i < 10; $i++) {
+            usleep(100000); // Sleep for 100 milliseconds
+
+            // Update the spinner
+            $output->write("\x08" . $spinner[$spinnerIndex]);
+            $spinnerIndex = ($spinnerIndex + 1) % 4;
+        }
+
+        return Constant::STATUS_TRUE;
     }
 }
