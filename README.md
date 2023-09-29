@@ -1,8 +1,9 @@
 <p align="center"><img src="https://raw.githubusercontent.com/vcian/art/main/php-db-auditor/php-db-auditor-hr.svg" width="50%" alt="Logo PHP DB Auditor"></p>
 
-![Packagist License](https://img.shields.io/packagist/l/vcian/php-db-auditor?style=for-the-badge)
-[![Total Downloads](https://img.shields.io/packagist/dt/vcian/php-db-auditor?style=for-the-badge)](https://packagist.org/packages/vcian/php-db-auditor)
-
+![Packagist License](https://img.shields.io/packagist/l/vcian/php-db-auditor
+)
+[![Total Downloads](https://img.shields.io/packagist/dt/vcian/php-db-auditor
+)](https://packagist.org/packages/vcian/php-db-auditor)
 
 ## Introduction
 
