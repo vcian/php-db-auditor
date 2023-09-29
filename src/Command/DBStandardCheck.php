@@ -28,6 +28,7 @@ class DBStandardCheck extends Command
 
         if (!$tableStatus) {
             $output->writeln('<fg=bright-red>No Table Found</>');
+            return Command::SUCCESS;
         }
 
         $io = new SymfonyStyle($input, $output);

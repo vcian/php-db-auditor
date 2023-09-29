@@ -19,6 +19,11 @@ Need to install dependency using [Composer](https://getcomposer.org):
 #### **composer install**
 
 ## Usage:
+
+#### **Database configuration**
+
+    The first thing you need to do is configure the database settings in the config.php file.
+
 You can see DB Auditor commands using below command.
 
 #### **php dbauditor**
@@ -67,7 +72,7 @@ Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recen
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-       We believe in 
+       We believe in
             👇
           ACT NOW
       PERFECT IT LATER
