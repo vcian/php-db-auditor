@@ -30,18 +30,24 @@
 ## Installation & Usage
 
 **Requires [PHP 8.1+](https://php.net/releases/)
+#### **Package install**
 
-Need to install dependency using [Composer](https://getcomposer.org):
-#### **composer install**
-
+    composer require vcian/php-db-auditor
 ## Usage:
+#### **Command configuration
 
+Create a symbolic link in the Ubuntu system using the following command:
+
+    ln -s vendor/vcian/php-db-auditor/dbauditor dbauditor
+
+Create a symbolic link in the Windows system using the following command:
+
+    mklink dbauditor vendor\vcian\php-db-auditor\dbauditor
 #### **Database configuration**
 
     The first thing you need to do is configure the database settings in the config.php file.
 
 You can see DB Auditor commands using below command.
-
 #### **php dbauditor**
 
     This command provides a list of available commands for database selection, such as checking database standards or verifying constraints.
