@@ -1,6 +1,6 @@
 All notable changes to `php-db-auditor` will be documented in this file.
 
-## v2.0.0 [29th September 2023]
+## v2.0.0 [6th October 2023]
 
 - Update readme file,changelog.
 - Resolved composer install issue.
