@@ -84,9 +84,16 @@ class DBConstraintCheck extends Command
      */
     public function displayTable(string $tableName, $io): void
     {
+        $engine = $this->getTableEngine($tableName);
+        if( $engine == 'InnoDB') {
+            $size = $this->getTablesSize($tableName);
+        } else {
+            $size = Constant::DASH;
+        }
+
         $data = [
             "table" => $tableName,
-            "size" => $this->getTablesSize($tableName),
+            "size" => $size,
             "fields" => $this->getTableFields($tableName),
             'field_count' => count($this->getTableFields($tableName)),
             'constrain' => [

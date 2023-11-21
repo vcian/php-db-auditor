@@ -27,7 +27,14 @@ trait Rules
             $tableList = $this->getTableList();
             foreach ($tableList as $tableName) {
                 $status = $this->checkStatus($tableName);
-                $size = $this->getTableSize($tableName);
+                $engine = $this->getTableEngine($tableName);
+
+                if( $engine == 'InnoDB') {
+                    $size = $this->getTableSize($tableName);
+                } else {
+                    $size = Constant::DASH;
+                }
+
                 $checkTableStandard[] = ["name" => $tableName, "status" => $status, "size" => $size];
             }
         } catch (Exception $exception) {
