@@ -127,6 +127,29 @@ trait DBConnection
     }
 
     /**
+     * Get Table Engine
+     * @param string $tableName
+     */
+    public function getTableEngine(string $tableName)
+    {
+        try {
+            $conn = createConnection();
+            $query = 'SELECT engine FROM information_schema.Tables where TABLE_SCHEMA = "'. $this->getDatabaseName() .'" AND TABLE_NAME = "' . $tableName . '" Limit 1';
+
+            $query = $conn->query($query);
+            $result = $query->fetch_assoc();
+
+            if (isset($result['ENGINE']) && !empty($result['ENGINE'])) {
+                return $result['ENGINE'];
+            }
+
+        } catch (Exception $exception) {
+            error_log($exception->getMessage());
+        }
+        return Constant::NULL;
+    }
+
+    /**
      * Get Field Data Type
      * @param string $tableName
      * @param string $fieldName
