@@ -38,7 +38,12 @@ trait AuditService
      */
     public function getTablesSize(string $tableName): string
     {
-        return $this->getTableSize($tableName);
+        $engine = $this->getTableEngine($tableName);
+        if( $engine == 'InnoDB') {
+            return $this->getTableSize($tableName);
+        } else {
+            return Constant::DASH;
+        }
     }
 
     /**
