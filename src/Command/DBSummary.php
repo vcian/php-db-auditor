@@ -16,7 +16,7 @@ class DBSummary extends Command
     protected function configure()
     {
         $this->setName('db:summary')
-            ->setDescription('Execute the DB summary command');
+            ->setDescription('Provides database information, including its name, size, table count, and character set');
     }
     /**
      * Execute command to check the standard of tables.

@@ -17,7 +17,7 @@ class DBStandardCheck extends Command
     protected function configure()
     {
         $this->setName('db:standard')
-            ->setDescription('This command provides a list of available commands for database selection, such as checking database standards or verifying constraints');
+            ->setDescription('Provides a list of tables with standard follow indication');
     }
     /**
      * Execute command to check the standard of tables.
