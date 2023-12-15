@@ -19,7 +19,7 @@ class DBConstraintCheck extends Command
     protected function configure()
     {
         $this->setName('db:constraint')
-            ->setDescription('This command gives you result with list of tables with primary,foreign,unique,index constraint');
+            ->setDescription('Provides a list of tables with fields, primary, foreign, unique, index constraint');
     }
     /**
      * Execute command to check the standard of tables.
